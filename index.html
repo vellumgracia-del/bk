@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Belajar Bersama</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Splash Screen -->
+  <div id="splash" class="splash-screen">
+    <div class="splash-logo">BelajarBersama</div>
+  </div>
+
+  <!-- Sidebar Navigation -->
+  <nav id="sidebar" class="sidebar">
+    <button id="closeSidebar" class="close-btn">×</button>
+    <ul>
+      <li><a href="#" data-page="home">🏠 Beranda</a></li>
+      <li><a href="#" data-page="belajar">📘 Belajar</a></li>
+      <li><a href="#" data-page="leaderboard">🏆 Leaderboard</a></li>
+      <li><a href="#" data-page="mentor">💬 Mentor</a></li>
+      <li><a href="#" data-page="feedback">📝 Feedback</a></li>
+    </ul>
+  </nav>
+
+  <!-- Header -->
+  <header class="header">
+    <button id="hamburger" class="hamburger">☰</button>
+    <h1 id="appTitle">Belajar Bersama</h1>
+  </header>
+
+  <!-- Main Pages -->
+  <main>
+    <section id="home" class="page active">
+      <h2>Selamat datang di BelajarBersama!</h2>
+      <p>Mulailah perjalanan belajarmu dan naik ke puncak leaderboard!</p>
+      <button id="startLearning" class="btn-primary">Mulai Belajar</button>
+    </section>
+
+    <section id="belajar" class="page">
+      <h2>Pilih Mata Pelajaran</h2>
+      <div id="subjectContainer" class="subject-container"></div>
+      <div id="quizContainer" class="quiz-container hidden"></div>
+    </section>
+
+    <section id="leaderboard" class="page">
+      <h2>🏆 Leaderboard</h2>
+      <ul id="leaderboardList" class="leaderboard-list"></ul>
+    </section>
+
+    <section id="mentor" class="page">
+      <h2>Chat dengan Mentor</h2>
+      <div class="mentor-box">
+        <input id="mentorInput" type="text" placeholder="Tulis pertanyaanmu...">
+        <button id="sendMentor">Kirim</button>
+      </div>
+      <div id="mentorChat" class="mentor-chat"></div>
+    </section>
+
+    <section id="feedback" class="page">
+      <h2>Berikan Feedback</h2>
+      <textarea id="feedbackInput" placeholder="Tuliskan pendapatmu di sini..."></textarea>
+      <button id="sendFeedback">Kirim</button>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
+
