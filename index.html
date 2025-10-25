@@ -1,72 +1,556 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Belajar Bersama</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prototipe Website Spektakuler</title>
+    <!-- Memuat Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Memuat Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Memuat Lucide Icons (Menggunakan UMD untuk memastikan objek global 'lucide' dimuat dengan benar) -->
+    <script src="https://unpkg.com/lucide-icons@latest/dist/umd/lucide.js"></script>
+    
+    <style>
+        /* Menggunakan font Inter dari Tailwind */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0a0a; /* Latar belakang gelap untuk efek dramatis */
+            color: #f1f1f1;
+        }
+        
+        /* Kontainer untuk canvas Three.js */
+        #hero-canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 0;
+            opacity: 0.5;
+        }
+
+        /* Gradient untuk hero section agar teks lebih terbaca */
+        .hero-gradient {
+            background: radial-gradient(circle at 50% 50%, rgba(10, 10, 10, 0.5) 0%, rgba(10, 10, 10, 1) 80%);
+        }
+
+        /* Animasi fade-in saat scroll */
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .scroll-reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Kustomisasi Accordion FAQ */
+        .faq-item summary {
+            cursor: pointer;
+            list-style: none; /* Hapus panah default */
+        }
+        .faq-item summary::-webkit-details-marker {
+            display: none; /* Hapus panah di Safari */
+        }
+        .faq-item summary .icon {
+            transition: transform 0.2s ease-in-out;
+        }
+        .faq-item[open] summary .icon {
+            transform: rotate(45deg);
+        }
+    </style>
 </head>
-<body>
-  <!-- Splash Screen -->
-  <div id="splash" class="splash-screen">
-    <div class="splash-logo">BelajarBersama</div>
-  </div>
+<body class="overflow-x-hidden">
 
-  <!-- Sidebar Navigation -->
-  <nav id="sidebar" class="sidebar">
-    <button id="closeSidebar" class="close-btn">×</button>
-    <ul>
-      <li><a href="#" data-page="home">🏠 Beranda</a></li>
-      <li><a href="#" data-page="belajar">📘 Belajar</a></li>
-      <li><a href="#" data-page="leaderboard">🏆 Leaderboard</a></li>
-      <li><a href="#" data-page="mentor">💬 Mentor</a></li>
-      <li><a href="#" data-page="feedback">📝 Feedback</a></li>
-    </ul>
-  </nav>
+    <!-- ===== HEADER ===== -->
+    <header class="fixed top-0 left-0 w-full bg-black/30 backdrop-blur-md z-50 border-b border-gray-800">
+        <nav class="container mx-auto max-w-7xl px-6 py-4 flex justify-between items-center">
+            <!-- Logo -->
+            <a href="#" class="text-2xl font-bold text-white flex items-center gap-2">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-blue-500"><path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Arsitektur
+            </a>
+            
+            <!-- Navigasi Utama (Desktop) -->
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="#fitur" class="text-gray-300 hover:text-white transition-colors">Fitur</a>
+                <a href="#pricing" class="text-gray-300 hover:text-white transition-colors">Pricing</a>
+                <a href="#faq" class="text-gray-300 hover:text-white transition-colors">FAQ</a>
+                <a href="#kontak" class="text-gray-300 hover:text-white transition-colors">Kontak</a>
+            </div>
+            
+            <!-- Tombol CTA Utama (Desktop) -->
+            <a href="#demo" class="hidden md:block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2.5 rounded-lg shadow-lg transition-all transform hover:scale-105">
+                Lihat Demo
+            </a>
 
-  <!-- Header -->
-  <header class="header">
-    <button id="hamburger" class="hamburger">☰</button>
-    <h1 id="appTitle">Belajar Bersama</h1>
-  </header>
+            <!-- Tombol Hamburger (Mobile) -->
+            <button id="menu-btn" class="md:hidden text-white z-50">
+                <i data-lucide="menu" class="w-6 h-6"></i>
+            </button>
+        </nav>
 
-  <!-- Main Pages -->
-  <main>
-    <section id="home" class="page active">
-      <h2>Selamat datang di BelajarBersama!</h2>
-      <p>Mulailah perjalanan belajarmu dan naik ke puncak leaderboard!</p>
-      <button id="startLearning" class="btn-primary">Mulai Belajar</button>
-    </section>
+        <!-- Menu Mobile -->
+        <div id="mobile-menu" class="hidden md:hidden absolute top-0 left-0 w-full h-screen bg-gray-950 flex flex-col items-center justify-center space-y-8 text-2xl z-40">
+            <a href="#fitur" class="text-gray-300 hover:text-white transition-colors menu-link">Fitur</a>
+            <a href="#pricing" class="text-gray-300 hover:text-white transition-colors menu-link">Pricing</a>
+            <a href="#faq" class="text-gray-300 hover:text-white transition-colors menu-link">FAQ</a>
+            <a href="#kontak" class="text-gray-300 hover:text-white transition-colors menu-link">Kontak</a>
+            <a href="#demo" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-4 rounded-lg shadow-lg transition-all menu-link">
+                Lihat Demo
+            </a>
+        </div>
+    </header>
 
-    <section id="belajar" class="page">
-      <h2>Pilih Mata Pelajaran</h2>
-      <div id="subjectContainer" class="subject-container"></div>
-      <div id="quizContainer" class="quiz-container hidden"></div>
-    </section>
+    <main>
+        <!-- ===== HERO SECTION ===== -->
+        <section id="hero" class="relative w-full h-screen flex items-center justify-center text-center overflow-hidden">
+            <!-- Container untuk Animasi 3D -->
+            <div id="hero-canvas-container"></div>
+            
+            <!-- Konten Teks Hero -->
+            <div class="relative z-10 p-6 hero-gradient w-full h-full flex flex-col items-center justify-center">
+                <h1 class="text-5xl md:text-7xl lg:text-8xl font-extrabold text-white mb-6 leading-tight">
+                    Membangun Masa Depan <br class="hidden md:block">
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-cyan-400">Spektakuler</span>
+                </h1>
+                <p class="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto mb-10">
+                    Platform kami menggabungkan desain canggih, arsitektur kuat, dan pengalaman pengguna yang tak tertandingi.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <a href="#demo" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-4 rounded-lg shadow-lg transition-all transform hover:scale-105 text-lg">
+                        Mulai Uji Coba Gratis
+                    </a>
+                    <a href="#fitur" class="bg-gray-700/50 backdrop-blur-sm border border-gray-600 hover:bg-gray-600/50 text-gray-200 font-bold px-8 py-4 rounded-lg shadow-lg transition-all transform hover:scale-105 text-lg">
+                        Pelajari Fitur
+                    </a>
+                </div>
+            </div>
+        </section>
 
-    <section id="leaderboard" class="page">
-      <h2>🏆 Leaderboard</h2>
-      <ul id="leaderboardList" class="leaderboard-list"></ul>
-    </section>
+        <!-- ===== FITUR UTAMA ===== -->
+        <section id="fitur" class="py-24 bg-gray-950">
+            <div class="container mx-auto max-w-7xl px-6">
+                <div class="text-center mb-16 scroll-reveal">
+                    <span class="text-blue-400 font-semibold uppercase">Mengapa Kami</span>
+                    <h2 class="text-4xl md:text-5xl font-bold text-white mt-3 mb-4">Solusi Inovatif untuk Anda</h2>
+                    <p class="text-lg text-gray-400 max-w-3xl mx-auto">
+                        Kami tidak hanya membuat website. Kami merancang pengalaman digital yang terintegrasi penuh dengan arsitektur back-end yang kuat.
+                    </p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Kartu Fitur 1 -->
+                    <div class="scroll-reveal bg-gray-900 p-8 rounded-2xl border border-gray-800 transition-all duration-300 hover:border-blue-500 hover:shadow-2xl hover:shadow-blue-500/10 transform hover:-translate-y-2">
+                        <div class="bg-blue-600/20 text-blue-400 w-16 h-16 rounded-xl flex items-center justify-center mb-6">
+                            <i data-lucide="layers" class="w-8 h-8"></i>
+                        </div>
+                        <h3 class="text-2xl font-semibold text-white mb-3">Arsitektur Front-End</h3>
+                        <p class="text-gray-400">
+                            Dibangun dengan React/Vue/Svelte, GSAP untuk animasi, dan Three.js untuk visual 3D. Sepenuhnya responsif dan dapat diakses.
+                        </p>
+                    </div>
+                    <!-- Kartu Fitur 2 -->
+                    <div class="scroll-reveal bg-gray-900 p-8 rounded-2xl border border-gray-800 transition-all duration-300 hover:border-blue-500 hover:shadow-2xl hover:shadow-blue-500/10 transform hover:-translate-y-2" style="transition-delay: 100ms;">
+                        <div class="bg-blue-600/20 text-blue-400 w-16 h-16 rounded-xl flex items-center justify-center mb-6">
+                            <i data-lucide="database" class="w-8 h-8"></i>
+                        </div>
+                        <h3 class="text-2xl font-semibold text-white mb-3">Back-End & API Kuat</h3>
+                        <p class="text-gray-400">
+                            API REST atau GraphQL yang aman dengan autentikasi JWT, didukung oleh database PostgreSQL/MongoDB dan disajikan melalui CDN.
+                        </p>
+                    </div>
+                    <!-- Kartu Fitur 3 -->
+                    <div class="scroll-reveal bg-gray-900 p-8 rounded-2xl border border-gray-800 transition-all duration-300 hover:border-blue-500 hover:shadow-2xl hover:shadow-blue-500/10 transform hover:-translate-y-2" style="transition-delay: 200ms;">
+                        <div class="bg-blue-600/20 text-blue-400 w-16 h-16 rounded-xl flex items-center justify-center mb-6">
+                            <i data-lucide="shield-check" class="w-8 h-8"></i>
+                        </div>
+                        <h3 class="text-2xl font-semibold text-white mb-3">Keamanan & CI/CD</h3>
+                        <p class="text-gray-400">
+                            Pipeline CI/CD otomatis untuk deployment yang andal, dilengkapi dengan CSP, rate limiting, dan sanitasi input.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-    <section id="mentor" class="page">
-      <h2>Chat dengan Mentor</h2>
-      <div class="mentor-box">
-        <input id="mentorInput" type="text" placeholder="Tulis pertanyaanmu...">
-        <button id="sendMentor">Kirim</button>
-      </div>
-      <div id="mentorChat" class="mentor-chat"></div>
-    </section>
+        <!-- ===== PRICING ===== -->
+        <section id="pricing" class="py-24">
+            <div class="container mx-auto max-w-7xl px-6">
+                <div class="text-center mb-16 scroll-reveal">
+                    <span class="text-blue-400 font-semibold uppercase">Harga</span>
+                    <h2 class="text-4xl md:text-5xl font-bold text-white mt-3 mb-4">Paket yang Sesuai Kebutuhan Anda</h2>
+                    <p class="text-lg text-gray-400 max-w-3xl mx-auto">
+                        Mulai gratis, tingkatkan seiring pertumbuhan bisnis Anda. Transparan dan tanpa biaya tersembunyi.
+                    </p>
+                </div>
 
-    <section id="feedback" class="page">
-      <h2>Berikan Feedback</h2>
-      <textarea id="feedbackInput" placeholder="Tuliskan pendapatmu di sini..."></textarea>
-      <button id="sendFeedback">Kirim</button>
-    </section>
-  </main>
+                <div class="grid lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                    <!-- Paket Basic -->
+                    <div class="scroll-reveal bg-gray-900 p-8 rounded-2xl border border-gray-800 flex flex-col">
+                        <h3 class="text-2xl font-semibold text-white mb-2">Basic</h3>
+                        <p class="text-gray-400 mb-6">Untuk proyek pribadi & pemula.</p>
+                        <div class="text-5xl font-bold text-white mb-6">
+                            Gratis
+                        </div>
+                        <ul class="space-y-3 text-gray-300 mb-8 flex-grow">
+                            <li class="flex items-center gap-3"><i data-lucide="check" class="w-5 h-5 text-green-500"></i> 1 Proyek</li>
+                            <li class="flex items-center gap-3"><i data-lucide="check" class="w-5 h-5 text-green-500"></i> 10.000 Request API</li>
+                            <li class="flex items-center gap-3"><i data-lucide="check" class="w-5 h-5 text-green-500"></i> Dukungan Komunitas</li>
+                        </ul>
+                        <a href="#" class="w-full text-center bg-gray-700/50 border border-gray-600 hover:bg-gray-600/50 text-gray-200 font-bold px-6 py-3 rounded-lg transition-all">
+                            Mulai Gratis
+                        </a>
+                    </div>
+                    
+                    <!-- Paket Pro (Populer) -->
+                    <div class="scroll-reveal bg-gray-900 p-8 rounded-2xl border-2 border-blue-500 relative shadow-2xl shadow-blue-500/20 flex flex-col transform scale-105">
+                        <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-500 text-white text-xs font-bold px-4 py-1 rounded-full uppercase">Paling Populer</span>
+                        <h3 class="text-2xl font-semibold text-white mb-2">Pro</h3>
+                        <p class="text-gray-400 mb-6">Untuk tim kecil & startup.</p>
+                        <div class="text-5xl font-bold text-white mb-6">
+                            $49<span class="text-lg text-gray-400">/bulan</span>
+                        </div>
+                        <ul class="space-y-3 text-gray-300 mb-8 flex-grow">
+                            <li class="flex items-center gap-3"><i data-lucide="check" class="w-5 h-5 text-green-500"></i> 10 Proyek</li>
+                            <li class="flex items-center gap-3"><i data-lucide="check" class="w-5 h-5 text-green-500"></i> 1.000.000 Request API</li>
+                            <li class="flex items-center gap-3"><i data-lucide="check" class="w-5 h-5 text-green-500"></i> CI/CD Terintegrasi</li>
+                            <li class="flex items-center gap-3"><i data-lucide="check" class="w-5 h-5 text-green-500"></i> Dukungan Email Prioritas</li>
+                        </ul>
+                        <a href="#" class="w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 rounded-lg transition-all shadow-lg shadow-blue-500/30">
+                            Pilih Paket Pro
+                        </a>
+                    </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-  <script src="script.js"></script>
+                    <!-- Paket Enterprise -->
+                    <div class="scroll-reveal bg-gray-900 p-8 rounded-2xl border border-gray-800 flex flex-col">
+                        <h3 class="text-2xl font-semibold text-white mb-2">Enterprise</h3>
+                        <p class="text-gray-400 mb-6">Untuk skala besar & kustom.</p>
+                        <div class="text-4xl font-bold text-white mb-6">
+                            Kustom
+                        </div>
+                        <ul class="space-y-3 text-gray-300 mb-8 flex-grow">
+                            <li class="flex items-center gap-3"><i data-lucide="check" class="w-5 h-5 text-green-500"></i> Proyek Tak Terbatas</li>
+                            <li class="flex items-center gap-3"><i data-lucide="check" class="w-5 h-5 text-green-500"></i> SLA Kustom & Keamanan</li>
+                            <li class="flex items-center gap-3"><i data-lucide="check" class="w-5 h-5 text-green-500"></i> Arsitek Solusi Khusus</li>
+                            <li class="flex items-center gap-3"><i data-lucide="check" class="w-5 h-5 text-green-500"></i> Dukungan 24/7</li>
+                        </ul>
+                        <a href="#kontak" class="w-full text-center bg-gray-700/50 border border-gray-600 hover:bg-gray-600/50 text-gray-200 font-bold px-6 py-3 rounded-lg transition-all">
+                            Hubungi Sales
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== FAQ (Frequently Asked Questions) ===== -->
+        <section id="faq" class="py-24 bg-gray-950">
+            <div class="container mx-auto max-w-3xl px-6">
+                <div class="text-center mb-16 scroll-reveal">
+                    <h2 class="text-4xl md:text-5xl font-bold text-white mt-3 mb-4">Pertanyaan Umum</h2>
+                    <p class="text-lg text-gray-400 max-w-3xl mx-auto">
+                        Masih bingung? Berikut beberapa jawaban atas pertanyaan umum.
+                    </p>
+                </div>
+                
+                <div class="space-y-6">
+                    <!-- FAQ Item 1 -->
+                    <details class="faq-item bg-gray-900 border border-gray-800 rounded-lg overflow-hidden scroll-reveal">
+                        <summary class="flex justify-between items-center p-6 text-lg font-semibold text-white">
+                            <span>Framework apa yang Anda gunakan untuk front-end?</span>
+                            <i data-lucide="plus" class="w-5 h-5 icon text-blue-400"></i>
+                        </summary>
+                        <div class="p-6 pt-0 text-gray-400">
+                            <p>Kami fleksibel dan dapat bekerja dengan React, Vue, atau Svelte, tergantung pada kebutuhan proyek Anda dan keahlian tim Anda. Kami juga ahli dalam animasi menggunakan GSAP dan Framer Motion.</p>
+                        </div>
+                    </details>
+                    
+                    <!-- FAQ Item 2 -->
+                    <details class="faq-item bg-gray-900 border border-gray-800 rounded-lg overflow-hidden scroll-reveal">
+                        <summary class="flex justify-between items-center p-6 text-lg font-semibold text-white">
+                            <span>Bagaimana Anda menangani keamanan back-end?</span>
+                            <i data-lucide="plus" class="w-5 h-5 icon text-blue-400"></i>
+                        </summary>
+                        <div class="p-6 pt-0 text-gray-400">
+                            <p>Keamanan adalah prioritas utama kami. Sesuai arsitektur, kami mengimplementasikan autentikasi JWT/OAuth, sanitasi input yang ketat, rate limiting, dan Content Security Policy (CSP) untuk melindungi dari serangan umum.</p>
+                        </div>
+                    </details>
+                    
+                    <!-- FAQ Item 3 -->
+                    <details class="faq-item bg-gray-900 border border-gray-800 rounded-lg overflow-hidden scroll-reveal">
+                        <summary class="flex justify-between items-center p-6 text-lg font-semibold text-white">
+                            <span>Apakah database bisa di-skala?</span>
+                            <i data-lucide="plus" class="w-5 h-5 icon text-blue-400"></i>
+                        </summary>
+                        <div class="p-6 pt-0 text-gray-400">
+                            <p>Tentu. Kami merancang skema database (baik SQL maupun NoSQL) untuk skalabilitas. Kami menggunakan praktik terbaik seperti indexing, replikasi, dan sharding (jika diperlukan) untuk menangani beban traffic yang tinggi.</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== KONTAK / CALL TO ACTION AKHIR ===== -->
+        <section id="kontak" class="py-24 text-center">
+            <div class="container mx-auto max-w-3xl px-6 scroll-reveal">
+                <h2 class="text-4xl md:text-5xl font-bold text-white mt-3 mb-6">
+                    Siap Memulai Proyek <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-cyan-400">Spektakuler</span> Anda?
+                </h2>
+                <p class="text-lg text-gray-400 max-w-2xl mx-auto mb-10">
+                    Hubungi tim kami untuk konsultasi gratis. Mari kita wujudkan arsitektur hebat Anda menjadi kenyataan.
+                </p>
+                <form id="contact-form" class="max-w-lg mx-auto grid grid-cols-1 gap-4">
+                    <input type="email" placeholder="Email Anda" class="w-full p-4 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    <textarea placeholder="Pesan Anda..." rows="4" class="w-full p-4 rounded-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" required></textarea>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-4 rounded-lg shadow-lg transition-all transform hover:scale-105 text-lg">
+                        Kirim Pesan (Simulasi)
+                    </button>
+                    <p id="form-status" class="text-green-400 h-4 mt-2"></p>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="bg-gray-950 border-t border-gray-800 pt-16 pb-8">
+        <div class="container mx-auto max-w-7xl px-6">
+            <div class="grid md:grid-cols-4 lg:grid-cols-6 gap-12 mb-12">
+                <!-- Kolom Logo & Deskripsi -->
+                <div class="lg:col-span-2">
+                    <a href="#" class="text-2xl font-bold text-white flex items-center gap-2 mb-4">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-blue-500"><path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        Arsitektur
+                    </a>
+                    <p class="text-gray-400 pr-8">Merancang dan membangun solusi web canggih dengan arsitektur yang kokoh.</p>
+                </div>
+                
+                <!-- Links Cepat -->
+                <div>
+                    <h4 class="font-semibold text-white mb-4 uppercase text-sm tracking-wider">Produk</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#fitur" class="text-gray-400 hover:text-white transition-colors">Fitur</a></li>
+                        <li><a href="#pricing" class="text-gray-400 hover:text-white transition-colors">Pricing</a></li>
+                        <li><a href="#demo" class="text-gray-400 hover:text-white transition-colors">Demo</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Studi Kasus</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Perusahaan -->
+                <div>
+                    <h4 class="font-semibold text-white mb-4 uppercase text-sm tracking-wider">Perusahaan</h4>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Tentang Kami</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Karir</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Blog</a></li>
+                        <li><a href="#kontak" class="text-gray-400 hover:text-white transition-colors">Kontak</a></li>
+                    </ul>
+                </div>
+
+                <!-- Newsletter Signup -->
+                <div class="lg:col-span-2">
+                    <h4 class="font-semibold text-white mb-4 uppercase text-sm tracking-wider">Ikuti Perkembangan</h4>
+                    <p class="text-gray-400 mb-4">Daftar newsletter kami untuk mendapatkan update terbaru.</p>
+                    <form id="newsletter-form" class="flex">
+                        <input type="email" placeholder="Email Anda" class="w-full p-3 rounded-l-lg bg-gray-800 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-3 rounded-r-lg transition-all">
+                            <i data-lucide="send" class="w-5 h-5"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center text-center md:text-left">
+                <p class="text-gray-500 text-sm mb-4 md:mb-0">
+                    &copy; <span id="current-year"></span> Arsitektur. Semua Hak Dilindungi.
+                </p>
+                <div class="flex space-x-5">
+                    <a href="#" class="text-gray-500 hover:text-white transition-colors"><i data-lucide="twitter" class="w-5 h-5"></i></a>
+                    <a href="#" class="text-gray-500 hover:text-white transition-colors"><i data-lucide="github" class="w-5 h-5"></i></a>
+                    <a href="#" class="text-gray-500 hover:text-white transition-colors"><i data-lucide="linkedin" class="w-5 h-5"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // Inisialisasi Ikon Lucide
+            // Memperbaiki masalah timing dengan penundaan 100ms untuk memastikan Lucide dimuat
+            setTimeout(() => {
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                } else {
+                    console.error("Lucide object is still undefined. Icon rendering may fail.");
+                }
+            }, 100); // Penundaan ditingkatkan menjadi 100ms
+
+
+            // Set Tahun Copyright
+            document.getElementById('current-year').textContent = new Date().getFullYear();
+
+            // ===== LOGIKA MENU MOBILE =====
+            const menuBtn = document.getElementById('menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const menuLinks = mobileMenu.querySelectorAll('.menu-link');
+
+            const toggleMenu = () => {
+                const isOpen = mobileMenu.classList.toggle('hidden');
+                menuBtn.innerHTML = isOpen ? 
+                    '<i data-lucide="menu" class="w-6 h-6"></i>' : 
+                    '<i data-lucide="x" class="w-6 h-6"></i>';
+                document.body.style.overflow = isOpen ? 'auto' : 'hidden';
+                // Panggil ulang createIcons untuk memastikan ikon di menu mobile (tombol X/Menu) ter-render
+                // Penundaan ditingkatkan menjadi 100ms
+                setTimeout(() => {
+                    if (typeof lucide !== 'undefined') {
+                        lucide.createIcons();
+                    }
+                }, 100);
+            };
+
+            menuBtn.addEventListener('click', toggleMenu);
+            menuLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    if (!mobileMenu.classList.contains('hidden')) {
+                        toggleMenu();
+                    }
+                });
+            });
+
+            // ===== LOGIKA ANIMASI SCROLL (IntersectionObserver) =====
+            const scrollElements = document.querySelectorAll('.scroll-reveal');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target); // Hanya animasikan sekali
+                    }
+                });
+            }, {
+                threshold: 0.1 // Picu saat 10% elemen terlihat
+            });
+
+            scrollElements.forEach(el => {
+                observer.observe(el);
+            });
+
+            // ===== LOGIKA FORM SIMULASI (Kontak & Newsletter) =====
+            const contactForm = document.getElementById('contact-form');
+            const formStatus = document.getElementById('form-status');
+            
+            contactForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                formStatus.textContent = 'Pesan terkirim (Simulasi)! Terima kasih.';
+                contactForm.reset();
+                setTimeout(() => formStatus.textContent = '', 3000);
+            });
+
+            const newsletterForm = document.getElementById('newsletter-form');
+            newsletterForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                // Mengganti alert() dengan pesan di chat/console karena alert() tidak didukung di environment ini
+                console.log('Terima kasih telah mendaftar newsletter (Simulasi)!'); 
+                
+                // Tambahkan elemen notifikasi sederhana di UI (di luar form-status)
+                const footerStatus = document.createElement('p');
+                footerStatus.className = 'text-green-400 mt-2';
+                footerStatus.textContent = 'Terima kasih telah mendaftar newsletter (Simulasi)!';
+                newsletterForm.parentNode.insertBefore(footerStatus, newsletterForm.nextSibling);
+
+                newsletterForm.reset();
+                setTimeout(() => footerStatus.remove(), 3000); // Hapus pesan setelah 3 detik
+            });
+
+            // ===== LOGIKA THREE.JS HERO SECTION =====
+            let scene, camera, renderer, mesh;
+            const container = document.getElementById('hero-canvas-container');
+
+            function initThree() {
+                try {
+                    // Scene
+                    scene = new THREE.Scene();
+                    
+                    // Camera
+                    camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+                    camera.position.z = 5;
+
+                    // Renderer
+                    renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+                    renderer.setSize(container.clientWidth, container.clientHeight);
+                    renderer.setPixelRatio(window.devicePixelRatio);
+                    container.appendChild(renderer.domElement);
+
+                    // Geometri (Objek 3D)
+                    // Menggunakan TorusKnot untuk bentuk yang lebih "spektakuler"
+                    const geometry = new THREE.TorusKnotGeometry(1.8, 0.5, 100, 16);
+                    const material = new THREE.MeshStandardMaterial({
+                        color: 0x3b82f6, // Warna biru
+                        wireframe: true,
+                        roughness: 0.5,
+                        metalness: 0.5
+                    });
+                    mesh = new THREE.Mesh(geometry, material);
+                    scene.add(mesh);
+
+                    // Pencahayaan
+                    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+                    scene.add(ambientLight);
+                    
+                    const pointLight = new THREE.PointLight(0xffffff, 1);
+                    pointLight.position.set(5, 5, 5);
+                    scene.add(pointLight);
+
+                    // Handle Mouse Move
+                    document.addEventListener('mousemove', onMouseMove, false);
+
+                    // Handle Resize
+                    window.addEventListener('resize', onWindowResize, false);
+                } catch (error) {
+                    console.error("Gagal menginisialisasi Three.js:", error);
+                    container.textContent = "Gagal memuat animasi 3D.";
+                }
+            }
+
+            // Fungsi Animasi Loop
+            function animate() {
+                if (!renderer) return; // Hentikan jika Three.js gagal
+                requestAnimationFrame(animate);
+
+                // Animasi putar
+                mesh.rotation.x += 0.001;
+                mesh.rotation.y += 0.002;
+
+                renderer.render(scene, camera);
+            }
+
+            // Fungsi Handle Resize
+            function onWindowResize() {
+                if (!camera || !renderer) return;
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            }
+
+            // Fungsi Handle Mouse Move (Parallax Effect)
+            function onMouseMove(event) {
+                if (!mesh) return;
+                const mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+                const mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+                
+                // Menggerakkan mesh sedikit berdasarkan posisi mouse
+                mesh.position.x = mouseX * 0.3;
+                mesh.position.y = mouseY * 0.3;
+            }
+
+            // Mulai Three.js
+            initThree();
+            animate();
+        });
+    </script>
 </body>
 </html>
-
